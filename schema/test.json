@@ -1,0 +1,16 @@
+[{
+    "name": "test",
+    "namespace": "testNameSpace",
+    "parse_mode": "strict",
+    "no_duplicates": "true",
+    "members": [
+        ["uint32_t", "testUint", {
+            "required": true,
+            "json_key": "testUintKey"
+        }],
+        ["std::string", "testString", {
+            "required": false,
+            "json_key": "testStringKey"
+        }]
+    ]
+}]
