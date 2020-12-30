@@ -33,23 +33,52 @@
 #include "jsonParser/jsonParser.hpp"
 #include "logger/simple_logger.hpp"
 
-
 using namespace std;
-#define TEST_SCHEMA_FILE "/home/mcong/static_json/schema/test.json"
+#define TEST_SCHEMA_FILE "/home/mcong/jsonParser/jsonParser/schema/test.json"
 namespace testNameSpace
 {
-    class test : public jsonParser::jsonParser<test>
+    class UCM_NudmUecmSingleNssai : public jsonParser::jsonParser<UCM_NudmUecmSingleNssai>
     {
     public:
-        uint32_t testUint;
-        std::string testString;
+        std::string mSst;
+        std::string mSd;
 
-        explicit test() : testUint(), testString() {}
+        explicit UCM_NudmUecmSingleNssai() : mSst(),
+                                             mSd()
+
+        {
+        }
 
         void staticjson_init(staticjson::ObjectHandler *h)
         {
-            h->add_property("testUintKey", &this->testUint, staticjson::Flags::Default);
-            h->add_property("testStringKey", &this->testString, staticjson::Flags::Optional);
+            h->add_property("sst", &this->mSst, staticjson::Flags::Default);
+            h->add_property("sd", &this->mSd, staticjson::Flags::Default);
+
+            h->set_flags(staticjson::Flags::Default);
+        }
+
+        friend std::ostream &operator<<(std::ostream &o, const UCM_NudmUecmSingleNssai &obj)
+        {
+            o << "sst:" << obj.mSst << std::endl;
+            o << "sd:" << obj.mSd << std::endl;
+
+            return o;
+        }
+    };
+
+    class Nssais : public jsonParser::jsonParser<Nssais>
+    {
+    public:
+        std::vector<UCM_NudmUecmSingleNssai> mNssais;
+        std::string mTest;
+        int mIntTest;
+        explicit Nssais() : mNssais() {}
+
+        void staticjson_init(staticjson::ObjectHandler *h)
+        {
+            h->add_property("Nssais", &this->mNssais, staticjson::Flags::Default);
+            h->add_property("test", &this->mTest, staticjson::Flags::Default);
+            h->add_property("testInt", &this->mIntTest, staticjson::Flags::Default);
             h->set_flags(staticjson::Flags::Default | staticjson::Flags::DisallowUnknownKey);
         }
     };
@@ -61,14 +90,27 @@ int main()
     INIT_LOGGER(simpleLoggerUptr);
     SET_LOG_LEVEL(debug);
 
-    jsonParser::jsonParser<testNameSpace::test>::loadApiSchema(TEST_SCHEMA_FILE);
+    jsonParser::jsonParser<testNameSpace::Nssais>::loadApiSchema(TEST_SCHEMA_FILE);
 
-    std::string testStr = R"({"testUintKey":10,"testStringKey":"teststringvalue"})";
+    // std::string testStr = R"({"Nssais": [{"sst":"aa","sd":"aaa"},{"sst": "aa","sd":"abc"}],  "test":"adc","testInt":256})";
+    std::string testStr = R"({"Nssais": [],  "test":"adc","testInt":255})";
 
     staticjson::ParseStatus result;
 
-    testNameSpace::test testObj;
-    testObj.decode(testStr, result);
+    testNameSpace::Nssais testObj;
+    std::string report;
+    auto ret = testObj.decode(testStr, result);
+    std::cout << "validation report is :" << ret.second << std::endl;
+    std::cout << "parse result: " << (int)ret.first << std::endl;
+    std::cout << "parse result description: " << result.description() << std::endl;
+    std::cout << "offset :" << result.offset() << std::endl;
+    std::cout << "error code " << result.error_code() << std::endl;
+    std::cout << "has error  " << result.has_error() << std::endl;
 
-    std::cout<<"testUintKey is : "<<testObj.testUint<<", testStringKey is : "<<testObj.testString<<std::endl;
+    //const staticjson::ErrorStack m_stack = result.error_stack();
+
+    if (ret.first == jsonParser::jsonRet::SUCCESS)
+    {
+        //std::cout << "testUintKey is : " << testObj.mNssais[0] << std::endl;
+    }
 }

@@ -77,37 +77,47 @@ namespace jsonParser
         }
 
         template <typename Object>
-        jsonRet decode(Object &obj,
-                       const std::string &jsonBuffer,
-                       staticjson::ParseStatus &result)
+        std::pair<jsonRet, std::string> decode(Object &obj,
+                                               const std::string &jsonBuffer,
+                                               staticjson::ParseStatus &result, std::string validatorReport = std::string(""))
         {
+            auto ret = std::make_pair(jsonRet::FAIL, "");
             if (NULL == schemaValidator)
             {
                 if (!staticjson::from_json_string(jsonBuffer.c_str(), &obj, &result))
                 {
-                    return jsonRet::FAIL;
+                    __LOG(error, "no validation schema, validation fail");
+                    return ret;
                 }
-                return jsonRet::SUCCESS;
+                return std::make_pair(jsonRet::SUCCESS, "");
             }
             rapidjson::Document d;
             schemaValidator->Reset();
             if (!staticjson::from_json_string(jsonBuffer.c_str(), &d, &result))
             {
-                return jsonRet::FAIL;
+                __LOG(error, "with validation schema, Json string validation fail");
+                return ret;
             }
             if (!d.Accept(*schemaValidator))
             {
-                return jsonRet::FAIL;
+                rapidjson::StringBuffer sb;
+                sb.Clear();
+                rapidjson::PrettyWriter<rapidjson::StringBuffer> w(sb);
+                schemaValidator->GetError().Accept(w);
+                std::string validReport = sb.GetString();
+                __LOG(info, "validation report is : " << validReport);
+                return std::make_pair(jsonRet::FAIL, validReport);
             }
             if (!staticjson::from_json_document(d, &obj, &result))
             {
-                return jsonRet::FAIL;
+                __LOG(error, "with validation schema, document validation fail");
+                return ret;
             }
-            return jsonRet::SUCCESS;
+            return std::make_pair(jsonRet::SUCCESS, "");
         }
 
-        jsonRet decode(const std::string &jsonBuffer,
-                       staticjson::ParseStatus &result)
+        std::pair<jsonRet, std::string> decode(const std::string &jsonBuffer,
+                                               staticjson::ParseStatus &result)
         {
             auto derived = static_cast<T *>(this);
             return decode<T>(*derived, jsonBuffer, result);
