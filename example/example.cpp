@@ -86,8 +86,7 @@ namespace testNameSpace
 
 int main()
 {
-    std::unique_ptr<simpleLogger> simpleLoggerUptr(new simpleLogger());
-    INIT_LOGGER(simpleLoggerUptr);
+    INIT_LOGGER(new simpleLogger());
     SET_LOG_LEVEL(debug);
 
     jsonParser::jsonParser<testNameSpace::Nssais>::loadApiSchema(TEST_SCHEMA_FILE);

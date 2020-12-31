@@ -23,9 +23,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "logger/logger.hpp"
-#pragma once
 
+#pragma once
+#include "logger/logger.hpp"
 class simpleLogger : public logger_iface
 {
 public:
