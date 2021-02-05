@@ -82,7 +82,7 @@ namespace jsonParser
                                                const std::string &jsonBuffer,
                                                staticjson::ParseStatus &result, std::string validatorReport = std::string(""))
         {
-            std::cout << "decode is called" << std::endl;
+            __LOG(info, "decode is called");
             auto ret = std::make_pair(jsonRet::FAIL, "");
             if (NULL == schemaValidator)
             {
@@ -100,7 +100,7 @@ namespace jsonParser
                 __LOG(error, "with validation schema, Json string validation fail");
                 return ret;
             }
-            std::cout<<"before accept"<<std::endl;
+            __LOG(info, "before accept");
             if (!d.Accept(*schemaValidator))
             {
                 rapidjson::StringBuffer sb;
@@ -111,20 +111,23 @@ namespace jsonParser
                 __LOG(info, "validation report is : " << validReport);
                 return std::make_pair(jsonRet::FAIL, validReport);
             }
-            std::cout<<"before from_json_document"<<std::endl;
+
+            __LOG(info, "before from_json_document");
             if (!staticjson::from_json_document(d, &obj, &result))
             {
                 __LOG(error, "with validation schema, document validation fail");
                 return ret;
             }
-              std::cout<<"after from_json_document"<<std::endl;
+            __LOG(info, "after from_json_document");
+
             return std::make_pair(jsonRet::SUCCESS, "");
         }
 
         std::pair<jsonRet, std::string> decode(const std::string &jsonBuffer,
                                                staticjson::ParseStatus &result)
         {
-            std::cout << "decode is called" << std::endl;
+
+            __LOG(info, "decode is called");
             auto derived = static_cast<T *>(this);
             return decode<T>(*derived, jsonBuffer, result);
         }

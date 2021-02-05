@@ -48,7 +48,8 @@ namespace testNameSpace
 
         void staticjson_init(staticjson::ObjectHandler *h)
         {
-            std::cout << "staticjson_init AccessTokenClaims is called" << std::endl;
+
+            __LOG(info, "staticjson_init AccessTokenClaims is called");
 
             h->add_property("aud", &this->aud, staticjson::Flags::Default);
             h->set_flags(staticjson::Flags::Default | staticjson::Flags::DisallowUnknownKey);
@@ -91,7 +92,7 @@ int main()
         for (auto it = testObj.aud.Begin(); it != testObj.aud.End(); it++)
         {
             std::string outString(it->GetString(), it->GetStringLength());
-            std::cout << "test! " << outString << std::endl;
+            __LOG(info, "test -> " << outString);
         }
     }
 }
