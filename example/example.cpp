@@ -32,53 +32,25 @@
 
 #include "jsonParser/jsonParser.hpp"
 #include "logger/simple_logger.hpp"
+#include "rapidjson/encodings.h"
 
 using namespace std;
-#define TEST_SCHEMA_FILE "/home/mcong/jsonParser/jsonParser/schema/test.json"
+#define TEST_SCHEMA_FILE "/home/mcong/jsonParser/schema/test.json"
 namespace testNameSpace
 {
-    class UCM_NudmUecmSingleNssai : public jsonParser::jsonParser<UCM_NudmUecmSingleNssai>
+
+    class AccessTokenClaims : public jsonParser::jsonParser<AccessTokenClaims>
     {
     public:
-        std::string mSst;
-        std::string mSd;
+        rapidjson::Document aud;
 
-        explicit UCM_NudmUecmSingleNssai() : mSst(),
-                                             mSd()
-
-        {
-        }
+        explicit AccessTokenClaims() {}
 
         void staticjson_init(staticjson::ObjectHandler *h)
         {
-            h->add_property("sst", &this->mSst, staticjson::Flags::Default);
-            h->add_property("sd", &this->mSd, staticjson::Flags::Default);
+            std::cout << "staticjson_init AccessTokenClaims is called" << std::endl;
 
-            h->set_flags(staticjson::Flags::Default);
-        }
-
-        friend std::ostream &operator<<(std::ostream &o, const UCM_NudmUecmSingleNssai &obj)
-        {
-            o << "sst:" << obj.mSst << std::endl;
-            o << "sd:" << obj.mSd << std::endl;
-
-            return o;
-        }
-    };
-
-    class Nssais : public jsonParser::jsonParser<Nssais>
-    {
-    public:
-        std::vector<UCM_NudmUecmSingleNssai> mNssais;
-        std::string mTest;
-        int mIntTest;
-        explicit Nssais() : mNssais() {}
-
-        void staticjson_init(staticjson::ObjectHandler *h)
-        {
-            h->add_property("Nssais", &this->mNssais, staticjson::Flags::Default);
-            h->add_property("test", &this->mTest, staticjson::Flags::Default);
-            h->add_property("testInt", &this->mIntTest, staticjson::Flags::Default);
+            h->add_property("aud", &this->aud, staticjson::Flags::Default);
             h->set_flags(staticjson::Flags::Default | staticjson::Flags::DisallowUnknownKey);
         }
     };
@@ -89,14 +61,15 @@ int main()
     INIT_LOGGER(new simpleLogger());
     SET_LOG_LEVEL(debug);
 
-    jsonParser::jsonParser<testNameSpace::Nssais>::loadApiSchema(TEST_SCHEMA_FILE);
+    jsonParser::jsonParser<testNameSpace::AccessTokenClaims>::loadApiSchema(TEST_SCHEMA_FILE);
 
-    // std::string testStr = R"({"Nssais": [{"sst":"aa","sd":"aaa"},{"sst": "aa","sd":"abc"}],  "test":"adc","testInt":256})";
-    std::string testStr = R"({"Nssais": [],  "test":"adc","testInt":255})";
+    // std::string testStr = R"({"AccessTokenClaims": [{"sst":"aa","sd":"aaa"},{"sst": "aa","sd":"abc"}],"test":"adc","testInt":226})";
+    //std::string testStr = R"({"AccessTokenClaims": [],  "test":"adc","testInt":255})";
+    std::string testStr = R"({"aud":["f81d4fae-7dec-11d0-a765-00a0c91e6bf6","f81d4fae-7dec-11d0-a765-00a0c91e6bf6"]})";
 
     staticjson::ParseStatus result;
 
-    testNameSpace::Nssais testObj;
+    testNameSpace::AccessTokenClaims testObj;
     std::string report;
     auto ret = testObj.decode(testStr, result);
     std::cout << "validation report is :" << ret.second << std::endl;
@@ -111,5 +84,14 @@ int main()
     if (ret.first == jsonParser::jsonRet::SUCCESS)
     {
         //std::cout << "testUintKey is : " << testObj.mNssais[0] << std::endl;
+    }
+
+    if (testObj.aud.IsArray())
+    {
+        for (auto it = testObj.aud.Begin(); it != testObj.aud.End(); it++)
+        {
+            std::string outString(it->GetString(), it->GetStringLength());
+            std::cout << "test! " << outString << std::endl;
+        }
     }
 }
