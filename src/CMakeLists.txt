@@ -67,3 +67,28 @@ INSTALL(
 
 # Install COPYRIGHT, README, bench
 #INSTALL(FILES COPYRIGHT README.md DESTINATION share/doc/${PROJECT_NAME})
+
+
+# 以下为RPM信息的设置，包名,概述，供应者，版本, 分组等等信息，通过其变量名称可以知道意思
+set(CPACK_PACKAGE_NAME "jsonParser")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "jsonParser based on rapid json and static json")
+set(CPACK_PACKAGE_VENDOR "Max")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_RPM_PACKAGE_GROUP "Max")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/maxcong001/jsonParser")
+set(CPACK_RPM_PACKAGE_DESCRIPTION "Max ")
+set(CPACK_PACKAGE_RELEASE 1)
+set(CPACK_RPM_PACKAGE_LICENSE "MIT Licence")
+ 
+# 设置默认生成器，RPM生成器会构建RPM安装包，其它还有TGZ/ZIP等
+set(CPACK_GENERATOR "RPM")
+ 
+# 安装前和安装后执行的shell脚本, 会打包到RPM中，安装时执行。这里可扩展性很强, 放在源码目录下即可
+# set(CPACK_RPM_PRE_INSTALL_SCRIPT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/pre_script.sh)
+# set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/post_script.sh)
+ 
+# 引入CPack模块，必须的
+include(CPack)
